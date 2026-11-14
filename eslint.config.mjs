@@ -66,9 +66,5 @@ export default [
     files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
     languageOptions: { ecmaVersion: 2022, globals: { ...globals.node } },
   },
-  {
-    files: ['**/*.js', '**/*.mjs'],
-    languageOptions: { ecmaVersion: 2022, globals: { ...globals.node } },
-  },
   prettier,
 ];
