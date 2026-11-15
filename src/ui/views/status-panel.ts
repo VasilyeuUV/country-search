@@ -6,6 +6,9 @@ import type { SearchState } from '../../domain/search-state.js';
 import { createElement } from '../dom.js';
 
 const ILLUSTRATION_PATH = './assets/illustrations/';
+const ITEM_VISIBLE_CLASS = 'status__item--visible';
+/** Must match the transition duration in styles.css. */
+const FADE_MS = 180;
 
 const ERROR_TITLES: Readonly<Record<SearchErrorKind, string>> = {
   aborted: 'REQUEST CANCELLED',
@@ -37,11 +40,18 @@ export interface StatusPanelOptions {
   readonly onRetry: () => void;
 }
 
+/** One visible block of the panel with the key that identifies it. */
+interface StatusView {
+  readonly key: string;
+  readonly node: HTMLElement;
+}
+
 /**
  * Creates the status panel.
  *
- * Only one state is rendered at a time: the loader, the empty result or the
- * failure with the retry action. The results grid lives outside the panel.
+ * Only one block is visible at a time. Blocks cross-fade instead of being
+ * swapped instantly, and a block with the same key is never re-created, so the
+ * loader keeps spinning across keystrokes instead of restarting.
  *
  * @param options - Retry callback.
  * @returns Panel element and its render function.
@@ -52,31 +62,77 @@ export function createStatusPanel(options: StatusPanelOptions): StatusPanel {
     attributes: { 'aria-live': 'polite' },
   });
 
+  let current: HTMLElement | null = null;
+  let currentKey: string | null = null;
+
+  const fadeOut = (node: HTMLElement): void => {
+    node.classList.remove(ITEM_VISIBLE_CLASS);
+
+    const remove = (): void => {
+      node.remove();
+    };
+
+    node.addEventListener('transitionend', remove, { once: true });
+    // fallback for reduced motion and for browsers that skip transitionend
+    window.setTimeout(remove, FADE_MS + 80);
+  };
+
+  const show = (key: string, node: HTMLElement): void => {
+    currentKey = key;
+
+    if (current !== null) {
+      fadeOut(current);
+    }
+
+    current = node;
+    element.append(node);
+    window.requestAnimationFrame(() => {
+      node.classList.add(ITEM_VISIBLE_CLASS);
+    });
+  };
+
   return {
     element,
     render: (state) => {
-      element.replaceChildren();
+      const next = describe(state, options.onRetry);
 
-      switch (state.status) {
-        case SEARCH_STATUS.loading:
-          element.append(createLoader());
-          break;
-        case SEARCH_STATUS.notFound:
-          element.append(createNotFound());
-          break;
-        case SEARCH_STATUS.error:
-          element.append(createError(state.kind, options.onRetry));
-          break;
-        default:
-          break;
+      if (next === null) {
+        if (current !== null) {
+          fadeOut(current);
+          current = null;
+        }
+
+        currentKey = null;
+        return;
       }
+
+      if (next.key === currentKey) {
+        return;
+      }
+
+      show(next.key, next.node);
     },
   };
 }
 
+function describe(state: SearchState, onRetry: () => void): StatusView | null {
+  switch (state.status) {
+    case SEARCH_STATUS.loading:
+      return { key: 'loading', node: createLoader() };
+    case SEARCH_STATUS.notFound:
+      return { key: 'not-found', node: createNotFound() };
+    case SEARCH_STATUS.error:
+      return { key: `error:${state.kind}`, node: createError(state.kind, onRetry) };
+    case SEARCH_STATUS.idle:
+      return { key: 'welcome', node: createWelcome() };
+    default:
+      return null;
+  }
+}
+
 function createLoader(): HTMLElement {
   return createElement('div', {
-    className: 'loader',
+    className: 'status__item loader',
     children: [
       createElement('div', {
         className: 'loader__scene',
@@ -99,9 +155,26 @@ function createLoader(): HTMLElement {
   });
 }
 
+function createWelcome(): HTMLElement {
+  return createElement('div', {
+    className: 'status__item welcome',
+    children: [
+      createElement('img', {
+        className: 'welcome__image',
+        attributes: { src: `${ILLUSTRATION_PATH}welcome.svg`, alt: '', 'aria-hidden': 'true' },
+      }),
+      createElement('p', { className: 'welcome__title', text: 'AWAITING QUERY' }),
+      createElement('p', {
+        className: 'welcome__hint',
+        text: 'Type a country name to start the scan.',
+      }),
+    ],
+  });
+}
+
 function createNotFound(): HTMLElement {
   return createElement('div', {
-    className: 'empty',
+    className: 'status__item empty',
     children: [
       createElement('img', {
         className: 'empty__image',
@@ -128,7 +201,7 @@ function createError(kind: SearchErrorKind, onRetry: () => void): HTMLElement {
   });
 
   return createElement('div', {
-    className: 'error',
+    className: 'status__item error',
     attributes: { role: 'alert' },
     children: [
       createElement('p', { className: 'error__title', text: ERROR_TITLES[kind] }),

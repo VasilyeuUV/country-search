@@ -34,6 +34,8 @@ export function mountApp(container: HTMLElement): SearchController {
     },
   });
 
+  status.render(controller.getState());
+
   controller.subscribe((state) => {
     status.render(state);
 
