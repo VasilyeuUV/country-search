@@ -1,6 +1,8 @@
 /** @file Composition root of the UI. */
 
+import { searchCountries } from '../data/api/search-countries.js';
 import { SEARCH_STATUS } from '../domain/search-state.js';
+import { createCachedSearch } from '../services/request-cache.js';
 import { createSearchController } from '../services/search-controller.js';
 import type { SearchController } from '../services/search-controller.js';
 import { createElement } from './dom.js';
@@ -18,7 +20,7 @@ import { createStatusPanel } from './views/status-panel.js';
  * @returns Search controller used by the mounted views.
  */
 export function mountApp(container: HTMLElement): SearchController {
-  const controller = createSearchController();
+  const controller = createSearchController({ search: createCachedSearch(searchCountries) });
   const details = createDetailsDialog();
   const results = createElement('div', { className: 'app__results' });
 

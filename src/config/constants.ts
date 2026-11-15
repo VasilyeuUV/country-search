@@ -36,3 +36,6 @@ export const DEVELOPER = 'Vasilyeu U.V.';
 
 /** RS School task */
 export const RSSCHOOL_TASK = 'RS School task';
+
+/** Maximum number of cached search queries. */
+export const CACHE_MAX_ENTRIES = 20;
