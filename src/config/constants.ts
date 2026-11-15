@@ -30,3 +30,9 @@ export const REPOSITORY_URL = 'https://github.com/VasilyeuUV/country-search';
 /** Task description in the RS School repository. */
 export const TASK_URL =
   'https://github.com/rolling-scopes-school/tasks/blob/master/fullstack-engineering/tasks/country-search/README.md';
+
+/** Developer. */
+export const DEVELOPER = 'Vasilyeu U.V.';
+
+/** RS School task */
+export const RSSCHOOL_TASK = 'RS School task';

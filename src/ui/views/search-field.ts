@@ -1,6 +1,6 @@
 /** @file Search field with a clear action. */
 
-import { createElement, createSvgElement } from '../dom.js';
+import { createElement } from '../dom.js';
 
 /** Public parts of the search field. */
 export interface SearchField {
@@ -36,7 +36,12 @@ export function createSearchField(options: SearchFieldOptions): SearchField {
   const clearButton = createElement('button', {
     className: 'search__clear',
     attributes: { type: 'button', title: 'Clear search', 'aria-label': 'Clear search' },
-    children: [createClearIcon()],
+    children: [
+      createElement('img', {
+        className: 'search__icon',
+        attributes: { src: './assets/icons/close.svg', alt: '', 'aria-hidden': 'true' },
+      }),
+    ],
   });
 
   clearButton.hidden = true;
@@ -64,17 +69,4 @@ export function createSearchField(options: SearchFieldOptions): SearchField {
   });
 
   return { element, input };
-}
-
-function createClearIcon(): SVGSVGElement {
-  const icon = createSvgElement('svg', {
-    class: 'search__icon',
-    viewBox: '0 0 16 16',
-    'aria-hidden': 'true',
-    focusable: 'false',
-  });
-
-  icon.append(createSvgElement('path', { d: 'M3 3 13 13M13 3 3 13' }));
-
-  return icon;
 }
