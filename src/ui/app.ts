@@ -13,6 +13,9 @@ import { createHeader } from './views/header.js';
 import { createSearchField } from './views/search-field.js';
 import { createStatusPanel } from './views/status-panel.js';
 
+/** Must match the transition duration in styles.css. */
+const RESULTS_FADE_MS = 160;
+
 /**
  * Mounts the application.
  *
@@ -24,8 +27,18 @@ export function mountApp(container: HTMLElement): SearchController {
   const details = createDetailsDialog();
   const results = createElement('div', { className: 'app__results' });
 
+  const fadeOutResults = (): void => {
+    for (const item of [...results.children]) {
+      item.classList.add('is-leaving');
+      window.setTimeout(() => {
+        item.remove();
+      }, RESULTS_FADE_MS);
+    }
+  };
+
   const searchField = createSearchField({
     onInput: (query) => {
+      fadeOutResults();
       controller.setQuery(query);
     },
   });
@@ -50,12 +63,7 @@ export function mountApp(container: HTMLElement): SearchController {
       return;
     }
 
-    // during loading the previous results stay on screen: only the status changes
-    if (state.status === SEARCH_STATUS.loading) {
-      return;
-    }
-
-    results.replaceChildren();
+    fadeOutResults();
   });
 
   const main = createElement('main', {

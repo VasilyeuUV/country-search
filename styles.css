@@ -299,6 +299,33 @@ body::after {
   min-width: 0;
 }
 
+.app__results > * {
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.app__results > .is-leaving {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+.country-grid {
+  animation: grid-in 180ms ease-out;
+}
+
+@keyframes grid-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- card ---------- */
 
 .country-card {
@@ -684,8 +711,8 @@ body::after {
   opacity: 0;
   transform: translateY(8px);
   transition:
-    opacity 180ms ease,
-    transform 180ms ease;
+    opacity 160ms ease,
+    transform 160ms ease;
 }
 
 .status__item--visible {
