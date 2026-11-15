@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" fill="none">
+  <style>
+    .frame {
+      stroke: #2f9e4f;
+      stroke-width: 2;
+    }
+    .ring {
+      stroke: #2f9e4f;
+      stroke-width: 2;
+      stroke-dasharray: 3 7;
+    }
+    .axis {
+      stroke: #1f3a1d;
+      stroke-width: 1;
+    }
+    .trail {
+      fill: #4dff7a;
+    }
+    .beam-glow {
+      stroke: #4dff7a;
+      stroke-width: 6;
+      opacity: 0.3;
+      stroke-linecap: round;
+    }
+    .beam {
+      stroke: #eafff0;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+    .dot {
+      fill: #4dff7a;
+    }
+    .blip {
+      fill: #f2fff0;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: blip 4s linear infinite;
+    }
+    .blip-1 {
+      animation-delay: 0.44s;
+    }
+    .blip-2 {
+      animation-delay: 1.5s;
+    }
+    .blip-3 {
+      animation-delay: 1.72s;
+    }
+    .blip-4 {
+      animation-delay: 2.94s;
+    }
+    .sweep {
+      transform-box: view-box;
+      transform-origin: 50% 50%;
+      animation: sweep 4s linear infinite;
+    }
+
+    @keyframes sweep {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes blip {
+      0% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+      12% {
+        opacity: 0.25;
+        transform: scale(0.85);
+      }
+      45%,
+      100% {
+        opacity: 0;
+        transform: scale(0.6);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sweep,
+      .blip {
+        animation: none;
+      }
+      .blip {
+        opacity: 0.45;
+      }
+    }
+  </style>
+
+  <rect class="frame" x="5" y="5" width="86" height="86" rx="14" />
+  <circle class="ring" cx="48" cy="48" r="30" />
+  <circle class="ring" cx="48" cy="48" r="18" />
+  <path class="axis" d="M48 14v68M14 48h68" />
+
+  <g class="sweep">
+    <path class="trail" opacity="0.45" d="M48 48 L78 48 L77.89 45.39 Z" />
+    <path class="trail" opacity="0.38" d="M48 48 L77.89 45.39 L77.54 42.79 Z" />
+    <path class="trail" opacity="0.31" d="M48 48 L77.54 42.79 L76.98 40.24 Z" />
+    <path class="trail" opacity="0.25" d="M48 48 L76.98 40.24 L76.19 37.74 Z" />
+    <path class="trail" opacity="0.2" d="M48 48 L76.19 37.74 L75.19 35.32 Z" />
+    <path class="trail" opacity="0.155" d="M48 48 L75.19 35.32 L73.98 33 Z" />
+    <path class="trail" opacity="0.115" d="M48 48 L73.98 33 L72.57 30.79 Z" />
+    <path class="trail" opacity="0.085" d="M48 48 L72.57 30.79 L70.98 28.72 Z" />
+    <path class="trail" opacity="0.06" d="M48 48 L70.98 28.72 L69.21 26.79 Z" />
+    <path class="trail" opacity="0.04" d="M48 48 L69.21 26.79 L67.28 25.02 Z" />
+    <path class="trail" opacity="0.025" d="M48 48 L67.28 25.02 L65.21 23.43 Z" />
+    <path class="trail" opacity="0.015" d="M48 48 L65.21 23.43 L63 22.02 Z" />
+    <path class="beam-glow" d="M48 48 L78 48" />
+    <path class="beam" d="M48 48 L78 48" />
+  </g>
+
+  <circle class="blip blip-1" cx="63.3" cy="60.9" r="2.4" />
+  <circle class="blip blip-2" cx="33.9" cy="62.1" r="2.5" />
+  <circle class="blip blip-3" cx="29.9" cy="56.5" r="2.2" />
+  <circle class="blip blip-4" cx="46.3" cy="28.1" r="2.6" />
+
+  <circle class="dot" cx="48" cy="48" r="2.6" />
+</svg>

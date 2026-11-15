@@ -1,0 +1,50 @@
+{
+  "name": "country-search",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Live country search: debounced input, AbortController cancellation, Jest TDD",
+  "engines": {
+    "node": ">=22.22.1"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n tsc,serve -c blue,green \"npm:dev:ts\" \"npm:dev:serve\"",
+    "dev:ts": "tsc -p tsconfig.dev.json --watch --preserveWatchOutput",
+    "dev:serve": "serve -l 5173 .",
+    "build": "tsc -p tsconfig.build.json",
+    "preview": "serve -l 4173 .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,mts,cts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,mjs,cjs,json,jsonc,md,css,html,yml,yaml}": "prettier --write --ignore-unknown"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^10.0.7",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsdoc": "^65.4.7",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "jest": "^30.5.2",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.10.1",
+    "serve": "^14.2.8",
+    "ts-jest": "^29.4.15",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2"
+  }
+}

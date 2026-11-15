@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" fill="none">
+  <style>
+    .line {
+      stroke: #4dff7a;
+      stroke-width: 2.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .accent {
+      fill: #4dff7a;
+    }
+    .ripple {
+      stroke: #2f9e4f;
+      stroke-width: 1.4;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: ripple 4s ease-out infinite;
+    }
+    .ripple-2 {
+      animation-delay: 2s;
+    }
+    .figure {
+      animation: glow 3s ease-in-out infinite;
+    }
+    .hand {
+      transform-box: fill-box;
+      transform-origin: 15% 85%;
+      animation: wave 3.2s ease-in-out infinite alternate;
+    }
+    .eye-right {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: wink 5.5s infinite;
+    }
+
+    @keyframes glow {
+      0%,
+      100% {
+        filter: drop-shadow(0 0 4px rgba(77, 255, 122, 0.35));
+      }
+      50% {
+        filter: drop-shadow(0 0 12px rgba(77, 255, 122, 0.75));
+      }
+    }
+
+    @keyframes wave {
+      from {
+        transform: rotate(-7deg);
+      }
+      to {
+        transform: rotate(7deg);
+      }
+    }
+
+    @keyframes wink {
+      0%,
+      90%,
+      100% {
+        transform: scaleY(1);
+      }
+      93%,
+      97% {
+        transform: scaleY(0.08);
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        opacity: 0.5;
+        transform: scale(0.7);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.25);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .figure,
+      .hand,
+      .eye-right,
+      .ripple {
+        animation: none;
+      }
+      .ripple {
+        opacity: 0;
+      }
+    }
+  </style>
+
+  <circle class="ripple" cx="80" cy="80" r="58" />
+  <circle class="ripple ripple-2" cx="80" cy="80" r="58" />
+
+  <g class="figure">
+    <path class="line" d="M62 30q18-16 36 0" />
+    <path class="line" d="M56 30h48" />
+
+    <circle class="line" cx="80" cy="46" r="20" />
+    <circle class="accent" cx="73" cy="44" r="2.2" />
+    <circle class="accent eye-right" cx="87" cy="44" r="2.2" />
+    <path class="line" d="M72 53q8 7 16 0" />
+
+    <path class="line" d="M74 66v8M86 66v8" />
+    <path class="line" d="M62 74h36c10 0 18 8 18 18v20H44V92c0-10 8-18 18-18Z" />
+    <path class="line" d="M72 74l8 10 8-10" />
+    <path class="line" d="M44 112h72" />
+    <rect class="line" x="74" y="107" width="12" height="10" rx="2" />
+
+    <path class="line" d="M62 112v22M98 112v22" />
+    <path class="line" d="M54 134h16M90 134h16" />
+    <path class="line" d="M44 92q-12 8-6 20" />
+
+    <path class="line" d="M116 90q14-6 14-20" />
+    <g class="hand">
+      <rect class="line" x="124" y="56" width="16" height="14" rx="4" />
+      <path class="line" d="M127 56v-9a3 3 0 0 1 6 0v9" />
+    </g>
+  </g>
+</svg>
