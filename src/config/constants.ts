@@ -17,3 +17,16 @@ export const REQUEST_TIMEOUT_MS = 8000;
 
 /** Locale used to format numbers in the UI. */
 export const LOCALE = 'en-US';
+
+/** Application title. */
+export const APP_TITLE = 'Country Search';
+
+/** Line under the title. */
+export const APP_TAGLINE = 'PIP-BOY TERMINAL // COUNTRY DATABASE';
+
+/** Public repository of the project. */
+export const REPOSITORY_URL = 'https://github.com/VasilyeuUV/country-search';
+
+/** Task description in the RS School repository. */
+export const TASK_URL =
+  'https://github.com/rolling-scopes-school/tasks/blob/master/fullstack-engineering/tasks/country-search/README.md';

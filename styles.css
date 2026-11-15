@@ -1,1 +1,156 @@
-/* Styles are added together with the UI stage. */
+/* Fallout-inspired palette, base layout and CRT decoration. */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #060a06;
+  --panel: #0c120b;
+  --line: #1f3a1d;
+  --green: #4dff7a;
+  --green-dim: #2f9e4f;
+  --text: #c8ffc4;
+  --muted: #6f9e6a;
+  --amber: #ffb648;
+  --focus: #a8ff8f;
+
+  --radius: 4px;
+  --space: 16px;
+  --mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', Consolas, 'Liberation Mono', monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: calc(var(--space) * 2);
+  padding: var(--space);
+  font-family: var(--mono);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background:
+    radial-gradient(1100px 550px at 50% -10%, rgb(77 255 122 / 8%), transparent 62%), var(--bg);
+}
+
+/* CRT scanlines and vignette: decorative, never interactive */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(rgb(0 0 0 / 16%) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 95% at 50% 50%, transparent 58%, rgb(0 0 0 / 55%) 100%);
+  opacity: 0.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- header ---------- */
+
+.app__header {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: calc(var(--space) / 2);
+  display: grid;
+  gap: 2px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.app__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--green);
+  text-shadow: 0 0 14px rgb(77 255 122 / 45%);
+}
+
+.app__tagline {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- main ---------- */
+
+.app__main {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  gap: calc(var(--space) * 1.5);
+  align-content: start;
+}
+
+/* ---------- footer ---------- */
+
+.app__footer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: calc(var(--space) / 2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space);
+  border-top: 1px solid var(--line);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.app__footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--green-dim);
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    text-shadow 160ms ease;
+}
+
+.app__footer-link:hover,
+.app__footer-link:focus-visible {
+  color: var(--green);
+  text-shadow: 0 0 10px rgb(77 255 122 / 45%);
+}
+
+.app__icon {
+  width: 16px;
+  height: 16px;
+  fill: currentcolor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
