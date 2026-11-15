@@ -12,6 +12,9 @@ import {
 } from '../format.js';
 
 const TITLE_ID = 'details-title';
+const VISIBLE_CLASS = 'details--visible';
+/** Must match the transition duration in styles.css. */
+const CLOSE_ANIMATION_MS = 160;
 
 /** Sections of the details screen. */
 export const DETAILS_TAB = {
@@ -71,6 +74,35 @@ export function createDetailsDialog(): DetailsDialog {
   });
 
   let country: Country | null = null;
+  let closeTimer: number | undefined;
+
+  const closeWithAnimation = (): void => {
+    if (!dialog.open) {
+      return;
+    }
+
+    dialog.classList.remove(VISIBLE_CLASS);
+    closeTimer = window.setTimeout(() => {
+      closeTimer = undefined;
+      dialog.close();
+    }, CLOSE_ANIMATION_MS);
+  };
+
+  const openImmediately = (): void => {
+    if (closeTimer !== undefined) {
+      window.clearTimeout(closeTimer);
+      closeTimer = undefined;
+    }
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    window.requestAnimationFrame(() => {
+      dialog.classList.add(VISIBLE_CLASS);
+    });
+  };
+
   let activeTab: DetailsTab = DETAILS_TAB.all;
 
   const selectTab = (tab: DetailsTab): void => {
@@ -124,13 +156,22 @@ export function createDetailsDialog(): DetailsDialog {
   });
 
   closeButton.addEventListener('click', () => {
-    dialog.close();
+    closeWithAnimation();
   });
 
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) {
-      dialog.close();
+      closeWithAnimation();
     }
+  });
+
+  dialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeWithAnimation();
+  });
+
+  dialog.addEventListener('close', () => {
+    dialog.classList.remove(VISIBLE_CLASS);
   });
 
   return {
@@ -144,7 +185,7 @@ export function createDetailsDialog(): DetailsDialog {
       selectTab(DETAILS_TAB.all);
 
       if (!dialog.open) {
-        dialog.showModal();
+        openImmediately();
       }
     },
   };
