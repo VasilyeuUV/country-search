@@ -9,6 +9,7 @@ import { createDetailsDialog } from './views/details-dialog.js';
 import { createFooter } from './views/footer.js';
 import { createHeader } from './views/header.js';
 import { createSearchField } from './views/search-field.js';
+import { createStatusPanel } from './views/status-panel.js';
 
 /**
  * Mounts the application.
@@ -27,21 +28,35 @@ export function mountApp(container: HTMLElement): SearchController {
     },
   });
 
+  const status = createStatusPanel({
+    onRetry: () => {
+      controller.retry();
+    },
+  });
+
   controller.subscribe((state) => {
-    results.replaceChildren();
+    status.render(state);
 
     if (state.status === SEARCH_STATUS.results) {
-      results.append(
+      results.replaceChildren(
         createCountryGrid(state.countries, (country) => {
           details.open(country);
         }),
       );
+      return;
     }
+
+    // during loading the previous results stay on screen: only the status changes
+    if (state.status === SEARCH_STATUS.loading) {
+      return;
+    }
+
+    results.replaceChildren();
   });
 
   const main = createElement('main', {
     className: 'app__main',
-    children: [searchField.element, results],
+    children: [searchField.element, status.element, results],
   });
 
   container.append(createHeader(), main, createFooter(), details.element);
