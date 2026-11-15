@@ -280,6 +280,33 @@ body::after {
   filter: drop-shadow(0 0 6px rgba(77, 255, 122, 0.8));
 }
 
+.search__retry {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.search__retry:hover,
+.search__retry:focus-visible {
+  border-color: var(--green);
+  box-shadow: 0 0 14px rgba(77, 255, 122, 0.3);
+}
+
+.search__retry img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+}
+
 /* ---------- history ---------- */
 
 .history {

@@ -1,4 +1,4 @@
-/** @file Search field with a clear action. */
+/** @file Search field with clear and retry actions. */
 
 import { createElement } from '../dom.js';
 
@@ -10,18 +10,23 @@ export interface SearchField {
   readonly input: HTMLInputElement;
   /** Sets the value and syncs the clear button visibility. */
   setValue(value: string): void;
+  /** Shows or hides the retry button. */
+  setRetryVisible(visible: boolean): void;
 }
 
 /** Options of the search field. */
 export interface SearchFieldOptions {
+  /** Called with the raw value on every change. */
   readonly onInput: (query: string) => void;
+  /** Called when the user asks to repeat the last search. */
+  readonly onRetry: () => void;
 }
 
 /**
  * Creates the search field.
  *
- * @param options - Input callback.
- * @returns Element and input reference.
+ * @param options - Input and retry callbacks.
+ * @returns Element, input reference and state helpers.
  */
 export function createSearchField(options: SearchFieldOptions): SearchField {
   const input = createElement('input', {
@@ -48,7 +53,23 @@ export function createSearchField(options: SearchFieldOptions): SearchField {
     ],
   });
 
+  const retryButton = createElement('button', {
+    className: 'search__retry',
+    attributes: {
+      type: 'button',
+      title: 'Retry the last search',
+      'aria-label': 'Repeat the last search',
+    },
+    children: [
+      createElement('img', {
+        className: 'search__icon',
+        attributes: { src: './assets/icons/retry.svg', alt: '', 'aria-hidden': 'true' },
+      }),
+    ],
+  });
+
   clearButton.hidden = true;
+  retryButton.hidden = true;
 
   const element = createElement('div', {
     className: 'search',
@@ -57,6 +78,7 @@ export function createSearchField(options: SearchFieldOptions): SearchField {
       createElement('span', { className: 'search__prefix', text: '>' }),
       input,
       clearButton,
+      retryButton,
     ],
   });
 
@@ -72,10 +94,18 @@ export function createSearchField(options: SearchFieldOptions): SearchField {
     options.onInput('');
   });
 
+  retryButton.addEventListener('click', () => {
+    options.onRetry();
+  });
+
   const setValue = (value: string): void => {
     input.value = value;
     clearButton.hidden = value.length === 0;
   };
 
-  return { element, input, setValue };
+  const setRetryVisible = (visible: boolean): void => {
+    retryButton.hidden = !visible;
+  };
+
+  return { element, input, setValue, setRetryVisible };
 }

@@ -44,6 +44,9 @@ export function mountApp(container: HTMLElement): SearchController {
       fadeOutResults();
       controller.setQuery(query);
     },
+    onRetry: () => {
+      controller.retry();
+    },
   });
 
   const historyList = createHistoryList({
@@ -69,6 +72,7 @@ export function mountApp(container: HTMLElement): SearchController {
   status.render(controller.getState());
 
   controller.subscribe((state) => {
+    searchField.setRetryVisible(state.status === SEARCH_STATUS.error);
     status.render(state);
 
     if (state.status === SEARCH_STATUS.results) {
