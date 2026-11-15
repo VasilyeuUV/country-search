@@ -39,3 +39,9 @@ export const RSSCHOOL_TASK = 'RS School task';
 
 /** Maximum number of cached search queries. */
 export const CACHE_MAX_ENTRIES = 20;
+
+/** Maximum number of queries kept in the history. */
+export const HISTORY_LIMIT = 8;
+
+/** Storage key of the search history. */
+export const HISTORY_STORAGE_KEY = 'country-search:history';
