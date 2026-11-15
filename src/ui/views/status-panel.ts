@@ -12,7 +12,7 @@ const ITEM_VISIBLE_CLASS = 'status__item--visible';
 const FADE_OUT_MS = 160;
 
 /** The loader is shown only when the request takes longer than this. */
-const LOADER_DELAY_MS = 600;
+const LOADER_DELAY_MS = 300;
 
 const ERROR_TITLES: Readonly<Record<SearchErrorKind, string>> = {
   aborted: 'REQUEST CANCELLED',
