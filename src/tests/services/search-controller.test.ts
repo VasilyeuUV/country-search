@@ -194,6 +194,25 @@ describe('createSearchController', () => {
     });
   });
 
+  it('retries the query typed after the failure', async () => {
+    const search = jest
+      .fn<SearchFn>()
+      .mockRejectedValueOnce(new HttpError(500))
+      .mockResolvedValueOnce([SPAIN]);
+    const controller = createSearchController({ search, debounceMs: DEBOUNCE_MS });
+
+    controller.setQuery('spain');
+    await jest.advanceTimersByTimeAsync(DEBOUNCE_MS);
+    expect(controller.getState().status).toBe('error');
+
+    controller.setQuery('fra');
+
+    controller.retry();
+    await jest.advanceTimersByTimeAsync(0);
+
+    expect(search).toHaveBeenLastCalledWith('fra', expect.any(AbortSignal));
+  });
+
   it('notifies subscribers and stops after unsubscribe', async () => {
     const search = jest.fn<SearchFn>().mockResolvedValue([]);
     const controller = createSearchController({ search, debounceMs: DEBOUNCE_MS });
