@@ -14,3 +14,6 @@ export const DEBOUNCE_MS = 400;
 
 /** Hard limit for a single request, in milliseconds. */
 export const REQUEST_TIMEOUT_MS = 8000;
+
+/** Locale used to format numbers in the UI. */
+export const LOCALE = 'en-US';
