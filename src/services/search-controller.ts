@@ -46,6 +46,7 @@ export function createSearchController(options: SearchControllerOptions = {}): S
   const listeners = new Set<(state: SearchState) => void>();
   let state: SearchState = { status: SEARCH_STATUS.idle, query: '' };
   let activeController: AbortController | null = null;
+  let lastQuery = '';
 
   const emit = (next: SearchState): void => {
     state = next;
@@ -107,6 +108,7 @@ export function createSearchController(options: SearchControllerOptions = {}): S
 
   const submit = (rawQuery: string): void => {
     const query = rawQuery.trim();
+    lastQuery = query;
 
     abortActive();
     debouncedRun.cancel();
@@ -121,6 +123,7 @@ export function createSearchController(options: SearchControllerOptions = {}): S
 
   const setQuery = (rawQuery: string): void => {
     const query = rawQuery.trim();
+    lastQuery = query;
 
     abortActive();
     debouncedRun.cancel();
@@ -138,11 +141,13 @@ export function createSearchController(options: SearchControllerOptions = {}): S
   };
 
   const retry = (): void => {
-    const { status, query } = state;
+    const { status } = state;
 
     if (status !== SEARCH_STATUS.error && status !== SEARCH_STATUS.notFound) {
       return;
     }
+
+    const query = lastQuery === '' ? state.query : lastQuery;
 
     debouncedRun.cancel();
     void run(query);
