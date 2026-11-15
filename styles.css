@@ -115,10 +115,10 @@ body::after {
   max-width: 1400px;
   margin: 0 auto;
   padding-top: calc(var(--space) / 2);
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space);
+  gap: 6px var(--space);
   border-top: 1px solid var(--line);
   font-size: 0.7rem;
   letter-spacing: 0.12em;
@@ -126,23 +126,8 @@ body::after {
   color: var(--muted);
 }
 
-.app__footer > .app__footer-link:first-child {
-  justify-self: start;
-}
-
-.app__year {
-  justify-self: center;
-}
-
-.app__footer > .app__footer-link:last-child {
-  justify-self: end;
-}
-
-@media (max-width: 640px) {
-  .app__footer {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
+.app__footer > * {
+  margin-inline: auto;
 }
 
 .app__footer-link {
