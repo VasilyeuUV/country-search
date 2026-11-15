@@ -194,17 +194,23 @@ describe('createSearchController', () => {
     });
   });
 
-  it('notifies subscribers and stops after unsubscribe', () => {
+  it('notifies subscribers and stops after unsubscribe', async () => {
     const search = jest.fn<SearchFn>().mockResolvedValue([]);
     const controller = createSearchController({ search, debounceMs: DEBOUNCE_MS });
     const listener = jest.fn();
     const unsubscribe = controller.subscribe(listener);
 
     controller.setQuery('spain');
-    expect(listener).toHaveBeenCalledTimes(1);
+
+    expect(listener).not.toHaveBeenCalled();
+
+    await jest.advanceTimersByTimeAsync(DEBOUNCE_MS);
+
+    expect(listener).toHaveBeenCalledTimes(2);
 
     unsubscribe();
     controller.setQuery('');
-    expect(listener).toHaveBeenCalledTimes(1);
+
+    expect(listener).toHaveBeenCalledTimes(2);
   });
 });

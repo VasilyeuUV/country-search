@@ -72,6 +72,8 @@ export function createSearchController(options: SearchControllerOptions = {}): S
     const controller = new AbortController();
     activeController = controller;
 
+    emit({ status: SEARCH_STATUS.loading, query });
+
     try {
       const countries = await search(query, controller.signal);
 
@@ -118,7 +120,10 @@ export function createSearchController(options: SearchControllerOptions = {}): S
       return;
     }
 
-    emit({ status: SEARCH_STATUS.loading, query });
+    if (state.status === SEARCH_STATUS.loading) {
+      emit({ status: SEARCH_STATUS.loading, query });
+    }
+
     debouncedRun(query);
   };
 
@@ -130,7 +135,6 @@ export function createSearchController(options: SearchControllerOptions = {}): S
     }
 
     debouncedRun.cancel();
-    emit({ status: SEARCH_STATUS.loading, query });
     void run(query);
   };
 

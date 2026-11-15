@@ -7,8 +7,12 @@ import { createElement } from '../dom.js';
 
 const ILLUSTRATION_PATH = './assets/illustrations/';
 const ITEM_VISIBLE_CLASS = 'status__item--visible';
-/** Must match the transition duration in styles.css. */
-const FADE_MS = 180;
+
+/** Duration of the fade-out before the next block is inserted, must match styles.css. */
+const FADE_OUT_MS = 160;
+
+/** The loader is shown only when the request takes longer than this. */
+const LOADER_DELAY_MS = 600;
 
 const ERROR_TITLES: Readonly<Record<SearchErrorKind, string>> = {
   aborted: 'REQUEST CANCELLED',
@@ -28,15 +32,12 @@ const ERROR_MESSAGES: Readonly<Record<SearchErrorKind, string>> = {
 
 /** Status panel with an imperative render. */
 export interface StatusPanel {
-  /** Panel element to mount once. */
   readonly element: HTMLElement;
-  /** Renders the given state, or nothing for `idle` and `results`. */
   render(state: SearchState): void;
 }
 
 /** Options of the status panel. */
 export interface StatusPanelOptions {
-  /** Called when the user asks to repeat the last search. */
   readonly onRetry: () => void;
 }
 
@@ -49,10 +50,6 @@ interface StatusView {
 /**
  * Creates the status panel.
  *
- * Only one block is visible at a time. Blocks cross-fade instead of being
- * swapped instantly, and a block with the same key is never re-created, so the
- * loader keeps spinning across keystrokes instead of restarting.
- *
  * @param options - Retry callback.
  * @returns Panel element and its render function.
  */
@@ -64,31 +61,83 @@ export function createStatusPanel(options: StatusPanelOptions): StatusPanel {
 
   let current: HTMLElement | null = null;
   let currentKey: string | null = null;
+  let fadeTimer: number | undefined;
+  let pendingTimer: number | undefined;
+  let pendingKey: string | null = null;
 
-  const fadeOut = (node: HTMLElement): void => {
-    node.classList.remove(ITEM_VISIBLE_CLASS);
+  const cancelFade = (): void => {
+    if (fadeTimer !== undefined) {
+      window.clearTimeout(fadeTimer);
+      fadeTimer = undefined;
+    }
+  };
 
-    const remove = (): void => {
-      node.remove();
-    };
+  const cancelPending = (): void => {
+    if (pendingTimer !== undefined) {
+      window.clearTimeout(pendingTimer);
+      pendingTimer = undefined;
+    }
 
-    node.addEventListener('transitionend', remove, { once: true });
-    // fallback for reduced motion and for browsers that skip transitionend
-    window.setTimeout(remove, FADE_MS + 80);
+    pendingKey = null;
   };
 
   const show = (key: string, node: HTMLElement): void => {
-    currentKey = key;
+    cancelFade();
 
-    if (current !== null) {
-      fadeOut(current);
+    const previous = current;
+
+    for (const child of [...element.children]) {
+      if (child !== previous && child !== node) {
+        child.remove();
+      }
     }
 
-    current = node;
     element.append(node);
-    window.requestAnimationFrame(() => {
+
+    if (previous === null) {
+      window.requestAnimationFrame(() => {
+        node.classList.add(ITEM_VISIBLE_CLASS);
+      });
+
+      current = node;
+      currentKey = key;
+      return;
+    }
+
+    previous.classList.remove(ITEM_VISIBLE_CLASS);
+    fadeTimer = window.setTimeout(() => {
+      fadeTimer = undefined;
+      previous.remove();
       node.classList.add(ITEM_VISIBLE_CLASS);
-    });
+    }, FADE_OUT_MS);
+
+    current = node;
+    currentKey = key;
+  };
+
+  const hide = (): void => {
+    cancelFade();
+
+    const previous = current;
+
+    current = null;
+    currentKey = null;
+
+    if (previous === null) {
+      return;
+    }
+
+    for (const child of [...element.children]) {
+      if (child !== previous) {
+        child.remove();
+      }
+    }
+
+    previous.classList.remove(ITEM_VISIBLE_CLASS);
+    fadeTimer = window.setTimeout(() => {
+      fadeTimer = undefined;
+      previous.remove();
+    }, FADE_OUT_MS);
   };
 
   return {
@@ -97,16 +146,30 @@ export function createStatusPanel(options: StatusPanelOptions): StatusPanel {
       const next = describe(state, options.onRetry);
 
       if (next === null) {
-        if (current !== null) {
-          fadeOut(current);
-          current = null;
-        }
-
-        currentKey = null;
+        cancelPending();
+        hide();
         return;
       }
 
+      // the same block is already scheduled: keep waiting for it
+      if (next.key === pendingKey) {
+        return;
+      }
+
+      cancelPending();
+
+      // the same block is already on screen: nothing to swap
       if (next.key === currentKey) {
+        return;
+      }
+
+      if (next.key === 'loading') {
+        pendingKey = next.key;
+        pendingTimer = window.setTimeout(() => {
+          pendingTimer = undefined;
+          pendingKey = null;
+          show(next.key, next.node);
+        }, LOADER_DELAY_MS);
         return;
       }
 
@@ -117,14 +180,14 @@ export function createStatusPanel(options: StatusPanelOptions): StatusPanel {
 
 function describe(state: SearchState, onRetry: () => void): StatusView | null {
   switch (state.status) {
+    case SEARCH_STATUS.idle:
+      return { key: 'welcome', node: createWelcome() };
     case SEARCH_STATUS.loading:
       return { key: 'loading', node: createLoader() };
     case SEARCH_STATUS.notFound:
       return { key: 'not-found', node: createNotFound() };
     case SEARCH_STATUS.error:
       return { key: `error:${state.kind}`, node: createError(state.kind, onRetry) };
-    case SEARCH_STATUS.idle:
-      return { key: 'welcome', node: createWelcome() };
     default:
       return null;
   }
