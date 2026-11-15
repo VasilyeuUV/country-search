@@ -1,3 +1,5 @@
 /** @file Application entry point. */
 
-export {};
+import { installMockTransportIfRequested } from './data/mock/install-mock-transport.js';
+
+installMockTransportIfRequested(window.location.search);
