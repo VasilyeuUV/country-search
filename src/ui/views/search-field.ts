@@ -4,8 +4,12 @@ import { createElement } from '../dom.js';
 
 /** Public parts of the search field. */
 export interface SearchField {
+  /** Container element to mount. */
   readonly element: HTMLElement;
+  /** The input itself, for focus management. */
   readonly input: HTMLInputElement;
+  /** Sets the value and syncs the clear button visibility. */
+  setValue(value: string): void;
 }
 
 /** Options of the search field. */
@@ -68,5 +72,10 @@ export function createSearchField(options: SearchFieldOptions): SearchField {
     options.onInput('');
   });
 
-  return { element, input };
+  const setValue = (value: string): void => {
+    input.value = value;
+    clearButton.hidden = value.length === 0;
+  };
+
+  return { element, input, setValue };
 }

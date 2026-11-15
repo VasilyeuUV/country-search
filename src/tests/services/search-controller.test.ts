@@ -213,4 +213,19 @@ describe('createSearchController', () => {
 
     expect(listener).toHaveBeenCalledTimes(2);
   });
+
+  it('submits a query immediately, without the debounce delay', async () => {
+    const search = jest.fn<SearchFn>().mockResolvedValue([SPAIN]);
+    const controller = createSearchController({ search, debounceMs: DEBOUNCE_MS });
+
+    controller.submit('spain');
+    await jest.advanceTimersByTimeAsync(0);
+
+    expect(search).toHaveBeenCalledTimes(1);
+    expect(controller.getState()).toEqual({
+      status: 'results',
+      query: 'spain',
+      countries: [SPAIN],
+    });
+  });
 });

@@ -3,6 +3,7 @@
 import { searchCountries } from '../data/api/search-countries.js';
 import { SEARCH_STATUS } from '../domain/search-state.js';
 import { createCachedSearch } from '../services/request-cache.js';
+import { createSearchHistory } from '../services/search-history.js';
 import { createSearchController } from '../services/search-controller.js';
 import type { SearchController } from '../services/search-controller.js';
 import { createElement } from './dom.js';
@@ -10,6 +11,7 @@ import { createCountryGrid } from './views/country-grid.js';
 import { createDetailsDialog } from './views/details-dialog.js';
 import { createFooter } from './views/footer.js';
 import { createHeader } from './views/header.js';
+import { createHistoryList } from './views/history-list.js';
 import { createSearchField } from './views/search-field.js';
 import { createStatusPanel } from './views/status-panel.js';
 
@@ -26,6 +28,7 @@ export function mountApp(container: HTMLElement): SearchController {
   const controller = createSearchController({ search: createCachedSearch(searchCountries) });
   const details = createDetailsDialog();
   const results = createElement('div', { className: 'app__results' });
+  const history = createSearchHistory(window.localStorage);
 
   const fadeOutResults = (): void => {
     for (const item of [...results.children]) {
@@ -43,6 +46,20 @@ export function mountApp(container: HTMLElement): SearchController {
     },
   });
 
+  const historyList = createHistoryList({
+    onSelect: (query) => {
+      searchField.setValue(query);
+      fadeOutResults();
+      controller.submit(query);
+    },
+    onClear: () => {
+      history.clear();
+      historyList.render(history.getAll());
+    },
+  });
+
+  historyList.render(history.getAll());
+
   const status = createStatusPanel({
     onRetry: () => {
       controller.retry();
@@ -55,6 +72,8 @@ export function mountApp(container: HTMLElement): SearchController {
     status.render(state);
 
     if (state.status === SEARCH_STATUS.results) {
+      history.add(state.query);
+      historyList.render(history.getAll());
       results.replaceChildren(
         createCountryGrid(state.countries, (country) => {
           details.open(country);
@@ -68,7 +87,7 @@ export function mountApp(container: HTMLElement): SearchController {
 
   const main = createElement('main', {
     className: 'app__main',
-    children: [searchField.element, status.element, results],
+    children: [searchField.element, historyList.element, status.element, results],
   });
 
   container.append(createHeader(), main, createFooter(), details.element);

@@ -29,16 +29,12 @@ export interface SearchController {
   getState(): SearchState;
   /** Subscribes to state changes; returns an unsubscribe function. */
   subscribe(listener: (state: SearchState) => void): () => void;
+  /** Runs the query immediately, without the debounce delay. */
+  submit(query: string): void;
 }
 
 /**
  * Creates the search controller.
- *
- * Cancellation is the primary mechanism: every input change aborts the active
- * request immediately, before the debounce delay, so an answer for an older
- * query cannot arrive after the input has moved on. The `aborted` check after
- * `await` covers the only remaining window - a promise that had already
- * resolved before the cancellation.
  *
  * @param options - Transport and debounce delay, both overridable for tests.
  * @returns Controller instance.
@@ -109,6 +105,20 @@ export function createSearchController(options: SearchControllerOptions = {}): S
     void run(query);
   }, debounceMs);
 
+  const submit = (rawQuery: string): void => {
+    const query = rawQuery.trim();
+
+    abortActive();
+    debouncedRun.cancel();
+
+    if (query === '') {
+      emit({ status: SEARCH_STATUS.idle, query: '' });
+      return;
+    }
+
+    void run(query);
+  };
+
   const setQuery = (rawQuery: string): void => {
     const query = rawQuery.trim();
 
@@ -140,6 +150,7 @@ export function createSearchController(options: SearchControllerOptions = {}): S
 
   return {
     setQuery,
+    submit,
     retry,
     getState: () => state,
     subscribe: (listener) => {
